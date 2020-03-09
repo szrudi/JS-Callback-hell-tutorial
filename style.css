@@ -5,10 +5,12 @@ body {
     font-family: monospace;
     font-size: xx-large;
 }
+
 a, a:visited {
     color: greenyellow;
     font-family: monospace;
 }
+
 textarea {
     width: 100%;
     border: 0;

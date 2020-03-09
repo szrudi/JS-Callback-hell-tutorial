@@ -21,7 +21,7 @@ Use ony printText() and clear() from common.js for DOM manipulation
 */
 deployBombs();
 
-function deployBombs(){
+function deployBombs() {
     let delay = 0;
     firstBomb(delay);
     delay += 1;
