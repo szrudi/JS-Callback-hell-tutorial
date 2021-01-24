@@ -34,6 +34,8 @@ function deployBombs() {
     fifthBomb(delay);
     delay += 5;
     sixthBomb(delay);
+    delay += 5;
+    seventhBomb(delay);
 
     console.log('All bombs deployed.')
 }
@@ -44,13 +46,15 @@ That is easy, we just add the strings in the
 textarea with the printText()
 */
 function firstBomb(initialWait) {
-    clear();
-    printText('The 1st bomb goes off in...');
-    printText('3...');
-    printText('2...');
-    printText('1...');
-    printText('Boom!');
-    console.log('The 1st bomb exploded.');
+    setTimeout(() => {
+        clear();
+        printText('The 1st bomb goes off in...');
+        printText('3...');
+        printText('2...');
+        printText('1...');
+        printText('Boom!');
+        console.log('The 1st bomb exploded.');
+    }, initialWait * 1000);
 }
 
 /*
@@ -67,7 +71,7 @@ function secondBomb(initialWait) {
             printText('3...');
             setTimeout(() => {
                 printText('2...');
-                // How much do we wait here? Was it easy to find out? :)
+                // How much do we wait here? Is it easy to find out? :)
                 setTimeout(() => {
                     printText('1...');
                     setTimeout(() => {
@@ -199,8 +203,8 @@ function fifthBomb(initialWait) {
 
 
 /*
-Our last solution is probably one of the best ways currently to
-handle the situation. Here is JavaScript Promise to the rescue!
+The next solution is probably one of the best ways currently to
+handle the situation. Here is JavaScript's Promise to the rescue!
 
 More detailed Promise example here: https://repl.it/@szrudi/Promise-to-wake-Neo
  */
@@ -265,5 +269,69 @@ function sixthBomb(initialWait) {
                 },
                 1000);
         });
+    }
+}
+
+/*
+Our last solution uses Promises with a special syntax. In most cases this makes
+working with Promises a lot easier to read/write, but in this example it might
+not help that much.
+
+For better examples why this syntax is helpfull see this page:
+https://javascript.info/async-await
+ */
+async function seventhBomb(initialWait) {
+    // we set the order of the steps here, every line with
+    // await pauses this function and continues when the 
+    // call to the function finishes
+    await new Promise((resolve, reject) => setTimeout(resolve, initialWait * 1000));
+    await initBomb();
+    await threeSecLeft();
+    await twoSecLeft();
+    await oneSecLeft();
+    await boom();
+
+    function initBomb() {
+        clear();
+        printText('The 7th bomb goes off in...');
+        // in this function there is no asynchronous task but
+        // we can still use await, it will continue instalntly
+    }
+
+    function threeSecLeft() {
+        // we want to print '3...' after 1 second
+        // on other projects this delayedPrintText could be
+        // an asynchronous function call like fetch() to get the data
+        return delayedPrintText('3...');
+    }
+
+    function twoSecLeft() {
+        return delayedPrintText('2...');
+    }
+
+    function oneSecLeft() {
+        return delayedPrintText('1...');
+    }
+
+    function boom() {
+        // in this case we give a different callback function
+        // as we want to write to the console as well 
+        return delayedPrintText('Boom!', (msg) => {
+            printText(msg);
+            console.log('The 7th bomb exploded.');
+        });
+    }
+
+    /*
+    This function will call the given callbackFunction after 1 sec delay
+    with the msg parameter. 
+    Default parameter function is printText.
+     */
+    async function delayedPrintText(msg, callbackFunction = printText) {
+        // this new Promise is automatically resolved after 1 sec
+        // and the message is added to the textarea
+        await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+        callbackFunction(msg);
+        return msg;
     }
 }
